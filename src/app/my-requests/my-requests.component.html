@@ -7,9 +7,11 @@
 
   <div *ngFor="let req of requests" class="request-card">
     <div class="request-header">
-      <h3>{{ req.name }}</h3>
+      <h3>{{ req.name }}</h3><br>
       <span class="status" [ngClass]="req.status">{{ req.status | titlecase }}</span>
     </div>
+
+    <h3>Document Requested: {{ req.document_type }}</h3>
     <p>Last Updated: {{ req.updated_at | date:'short' }}</p>
 
     <div class="request-actions">

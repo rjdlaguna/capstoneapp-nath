@@ -60,7 +60,7 @@ export class ProcessRequestComponent implements OnInit {
     let headers: HttpHeaders;
     try { headers = this.getAuthHeaders(); } catch { return; }
 
-    this.http.post(`${this.backendUrl}/api/document_request/${this.requestId}/processed`, {}, { headers })
+    this.http.post(`${this.backendUrl}/api/document_request/${this.requestId}/approved`, {}, { headers })
       .subscribe({
         next: () => alert('Request marked as In Process'),
         error: (err) => {

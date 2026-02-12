@@ -20,6 +20,8 @@ export class BirthComponent {
     });
   }
 
+  documentType = 'Birth Certificate';
+
   get f() {
     return this.documentForm.controls;
   }
@@ -44,6 +46,7 @@ export class BirthComponent {
 
     const formData = new FormData();
     formData.append('name', this.documentForm.value.name);
+    formData.append('document_type', this.documentType);
     if (this.selectedFile) {
       formData.append('file', this.selectedFile, this.selectedFile.name);
     }

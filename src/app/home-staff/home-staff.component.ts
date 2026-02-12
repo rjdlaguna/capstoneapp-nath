@@ -12,14 +12,14 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./home-staff.component.css']
 })
 export class HomeStaffComponent implements OnInit {
-  documentRequests: any[] = [];
-  inProcess: any[] = [];
-  processed: any[] = [];
+  pending: any[] = [];
+  under_review: any[] = [];
+  approved: any[] = [];
   denied: any[] = [];
 
   // ---------- STATISTICS ----------
   stats = {
-    processed: { today: 0, week: 0, month: 0 },
+    approved: { today: 0, week: 0, month: 0 },
     denied: { today: 0, week: 0, month: 0 }
   };
 
@@ -47,9 +47,9 @@ export class HomeStaffComponent implements OnInit {
       const activeData = data.filter(d => d.archived === 0);
 
       // Split data by status
-      this.documentRequests = activeData.filter(d => d.status === 'pending');
-      this.inProcess = activeData.filter(d => d.status === 'in_process');
-      this.processed = activeData.filter(d => d.status === 'processed');
+      this.pending = activeData.filter(d => d.status === 'pending');
+      this.under_review = activeData.filter(d => d.status === 'under_review');
+      this.approved = activeData.filter(d => d.status === 'approved');
       this.denied = activeData.filter(d => d.status === 'denied');
 
       // Calculate stats
@@ -63,18 +63,18 @@ export class HomeStaffComponent implements OnInit {
   calculateStats(data: any[]) {
     const now = new Date();
 
-    const processedData = data.filter(d => d.status === 'processed');
+    const processedData = data.filter(d => d.status === 'approved');
     const deniedData = data.filter(d => d.status === 'denied');
 
-    this.stats.processed.today = processedData.filter(d =>
+    this.stats.approved.today = processedData.filter(d =>
       this.isSameDay(new Date(d.updated_at || d.date_created), now)
     ).length;
 
-    this.stats.processed.week = processedData.filter(d =>
+    this.stats.approved.week = processedData.filter(d =>
       this.isSameWeek(new Date(d.updated_at || d.date_created), now)
     ).length;
 
-    this.stats.processed.month = processedData.filter(d =>
+    this.stats.approved.month = processedData.filter(d =>
       this.isSameMonth(new Date(d.updated_at || d.date_created), now)
     ).length;
 

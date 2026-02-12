@@ -15,42 +15,69 @@
   const sgMail = require('@sendgrid/mail');
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-
+  // OTP EMAIL
   function sendOtpEmail(to, otp) {
     const msg = {
       to,
       from: process.env.SENDGRID_FROM,
-      subject: 'Your OTP Code',
-      html: `<p>Your verification code is: <b>${otp}</b></p>`,
+      subject: 'DRT - OTP Code',
+      html: `
+      <p>Dear User,</p>
+
+      <p>
+        To proceed with your <b>DTR account verification</b>, please use the
+        One-Time Password (OTP) below:
+      </p>
+
+      <h2 style="letter-spacing: 2px;">${otp}</h2>
+
+      <p>
+        For security reasons, this code will expire in <b>5 minutes</b>
+        and can only be used once.
+      </p>
+
+      <p>
+        If you did not initiate this request, please ignore this message
+        or contact support immediately.
+      </p>
+
+      <br/>
+      <p>Sincerely,<br/><b>DTR Security Team</b></p>
+      `,
     };
 
     return sgMail.send(msg);
   }
 
-// ===== Helper function to send document request status emails =====
-function sendRequestStatusEmail(to, status, reason = null) {
+// DOCUMENT REQUEST MESSAGES 
+function sendRequestStatusEmail(to, status, reason = null, documentType = '') {
   if (!to) return Promise.resolve();
 
   const subjects = {
-    in_process: 'Your document request is now In Process',
-    processed: 'Your document request has been Processed',
+    pending: 'Your document request has been submitted',
+    under_review: 'Your document request is now Under Review',
+    approved: 'Your document request has been Approved',
     denied: 'Your document request was Denied'
   };
 
   const messages = {
-    in_process: `
+    pending: `
       <p>Hello,</p>
-      <p>Your document request is now <b>In Process</b>.</p>
+      <p>Your request for <b>${documentType}</b> has been <b>submitted</b> and is now <b>pending review</b>.</p>
+      <p>You will receive another update once staff begins processing your request.</p>
     `,
-    processed: `
+    under_review: `
       <p>Hello,</p>
-      <p>Your document request has been <b>Processed</b>.</p>
+      <p>Your request for <b>${documentType}</b> is now <b>Under Review</b>.</p>
+    `,
+    approved: `
+      <p>Hello,</p>
+      <p>Your request for <b>${documentType}</b> has been <b>Approved and processed</b>.</p>
     `,
     denied: `
       <p>Hello,</p>
-      <p>Unfortunately, Your document request was <b>Denied</b>.</p>
-      <p><b>Reason of Denial:</b></p>
-      <p>${reason || 'No reason provided.'}</p>
+      <p>Unfortunately, your request for <b>${documentType}</b> was <b>Denied</b>.</p>
+      <p><b>Reason:</b> ${reason || 'No reason provided.'}</p>
     `
   };
 
@@ -63,8 +90,6 @@ function sendRequestStatusEmail(to, status, reason = null) {
 
   return sgMail.send(msg);
 }
-
-
 
   const app = express();
 
@@ -635,24 +660,25 @@ app.post('/api/document_request/:id/process', verifyToken, (req, res) => {
     SET status = ?, updated_at = NOW(), assigned_staff_id = ?
     WHERE RequestID = ?
   `;
-  db.query(sql, ['in_process', staffId, requestId], (err, result) => {
+  db.query(sql, ['under_review', staffId, requestId], (err, result) => {
     if (err) return res.status(500).json({ message: 'Failed to process request', error: err.message });
     if (result.affectedRows === 0) return res.status(404).json({ message: 'Request not found' });
 
-    // Get user email
+    // Get user email and document type
     db.query(
-      'SELECT u.email FROM document_request dr JOIN users u ON dr.user_id = u.id WHERE dr.RequestID = ?',
+      'SELECT u.email, dr.document_type FROM document_request dr JOIN users u ON dr.user_id = u.id WHERE dr.RequestID = ?',
       [requestId],
       (err, results) => {
         if (!err && results.length > 0) {
           const email = results[0].email;
-          const emailMsg = `Your request is now In Process.`;
-          sendRequestStatusEmail(email, 'in_process');
+          const documentType = results[0].document_type;
+          sendRequestStatusEmail(email, 'under_review', null, documentType);
 
           // Log to history
+          const emailMsg = `Your request for ${documentType} is now In Process.`;
           db.query(
             'INSERT INTO request_status_history (RequestID, status, email_message) VALUES (?, ?, ?)',
-            [requestId, 'in_process', emailMsg],
+            [requestId, 'under_review', emailMsg],
             (err) => { if (err) console.error('Failed to log history', err); }
           );
         }
@@ -663,8 +689,8 @@ app.post('/api/document_request/:id/process', verifyToken, (req, res) => {
   });
 });
 
-// ===== Mark request as "Processed" =====
-app.post('/api/document_request/:id/processed', verifyToken, (req, res) => {
+// ===== Mark request as "Approved" =====
+app.post('/api/document_request/:id/approved', verifyToken, (req, res) => {
   const requestId = req.params.id;
   const staffId = req.user.id;
 
@@ -673,29 +699,31 @@ app.post('/api/document_request/:id/processed', verifyToken, (req, res) => {
     SET status = ?, updated_at = NOW(), assigned_staff_id = ?
     WHERE RequestID = ?
   `;
-  db.query(sql, ['processed', staffId, requestId], (err, result) => {
+  db.query(sql, ['approved', staffId, requestId], (err, result) => {
     if (err) return res.status(500).json({ message: 'Failed to process request', error: err.message });
     if (result.affectedRows === 0) return res.status(404).json({ message: 'Request not found' });
 
+    // Get user email and document type
     db.query(
-      'SELECT u.email FROM document_request dr JOIN users u ON dr.user_id = u.id WHERE dr.RequestID = ?',
+      'SELECT u.email, dr.document_type FROM document_request dr JOIN users u ON dr.user_id = u.id WHERE dr.RequestID = ?',
       [requestId],
       (err, results) => {
         if (!err && results.length > 0) {
           const email = results[0].email;
-          const emailMsg = `Your request has been Processed.`;
-          sendRequestStatusEmail(email, 'processed');
+          const documentType = results[0].document_type;
+          sendRequestStatusEmail(email, 'approved', null, documentType);
 
+          const emailMsg = `Your request for ${documentType} has been Approved.`;
           db.query(
             'INSERT INTO request_status_history (RequestID, status, email_message) VALUES (?, ?, ?)',
-            [requestId, 'processed', emailMsg],
+            [requestId, 'approved', emailMsg],
             (err) => { if (err) console.error('Failed to log history', err); }
           );
         }
       }
     );
 
-    res.json({ message: 'Request marked as Processed and assigned to you' });
+    res.json({ message: 'Request marked as Approved and assigned to you' });
   });
 });
 
@@ -716,15 +744,17 @@ app.put('/api/document_request/:id/deny', verifyToken, (req, res) => {
     if (err) return res.status(500).json({ message: 'Failed to update request', error: err.message });
     if (result.affectedRows === 0) return res.status(404).json({ message: 'Request not found' });
 
+    // Get user email and document type
     db.query(
-      'SELECT u.email FROM document_request dr JOIN users u ON dr.user_id = u.id WHERE dr.RequestID = ?',
+      'SELECT u.email, dr.document_type FROM document_request dr JOIN users u ON dr.user_id = u.id WHERE dr.RequestID = ?',
       [requestId],
       (err, results) => {
         if (!err && results.length > 0) {
           const email = results[0].email;
-          const emailMsg = `Your request was Denied. Reason: ${reason}`;
-          sendRequestStatusEmail(email, 'denied', reason);
+          const documentType = results[0].document_type;
+          sendRequestStatusEmail(email, 'denied', reason, documentType);
 
+          const emailMsg = `Your request for ${documentType} was Denied. Reason: ${reason}`;
           db.query(
             'INSERT INTO request_status_history (RequestID, status, email_message) VALUES (?, ?, ?)',
             [requestId, 'denied', emailMsg],
@@ -737,7 +767,6 @@ app.put('/api/document_request/:id/deny', verifyToken, (req, res) => {
     res.json({ message: 'Request marked as Denied and assigned to you' });
   });
 });
-
 
 // Admin: Get all document requests
 app.get('/api/admin/document_request', verifyToken, checkRole(1), (req, res) => {
@@ -812,7 +841,7 @@ app.put('/api/document_request/:id/archive', verifyToken, (req, res) => {
 app.get('/api/my/requests', verifyToken, (req, res) => {
   const userId = req.user.id;
   const sql = `
-    SELECT RequestID, name, status, updated_at, file_path
+    SELECT RequestID, name, document_type, status, updated_at, file_path
     FROM document_request
     WHERE user_id = ?
     ORDER BY updated_at DESC
@@ -859,10 +888,12 @@ app.get('/api/my/requests/:id/download', verifyToken, (req, res) => {
 const uploadDoc = multer({ storage: multer.memoryStorage() });
 
 app.post('/api/document_request', verifyToken, uploadDoc.single('file'), (req, res) => {
-  const { name } = req.body;
-  const userId = req.user.id; // get user_id from JWT
+  const { name, document_type } = req.body; // <-- add document_type
+  const userId = req.user.id;
 
-  if (!name) return res.status(400).json({ error: 'Name is required' });
+  if (!name || !document_type) {
+    return res.status(400).json({ error: 'Name and document_type are required' });
+  }
 
   let filePath = null;
 
@@ -875,19 +906,29 @@ app.post('/api/document_request', verifyToken, uploadDoc.single('file'), (req, r
 
     try {
       fs.writeFileSync(fullPath, req.file.buffer);
-      filePath = 'uploads/' + filename; // relative path to store in DB
+      filePath = 'uploads/' + filename;
     } catch (err) {
       console.error('Failed to save file:', err);
       return res.status(500).json({ error: 'Failed to save file' });
     }
   }
 
-  const sql = 'INSERT INTO document_request (name, file_path, user_id) VALUES (?, ?, ?)';
-  db.query(sql, [name, filePath, userId], (err, result) => {
+  const sql = 'INSERT INTO document_request (name, document_type, file_path, user_id) VALUES (?, ?, ?, ?)';
+  db.query(sql, [name, document_type, filePath, userId], (err, result) => {
     if (err) {
       console.error('Database error:', err);
       return res.status(500).json({ error: 'Database insert failed' });
     }
+
+    // Send email to user about request
+    db.query('SELECT email FROM users WHERE id = ?', [userId], (err, results) => {
+      if (!err && results.length > 0) {
+        const email = results[0].email;
+        const msg = `Your request for ${document_type} has been submitted successfully!`;
+        sendRequestStatusEmail(email, 'pending', null, document_type); // send document_type
+      }
+    });
+
     res.json({ success: true, id: result.insertId, filePath });
   });
 });
