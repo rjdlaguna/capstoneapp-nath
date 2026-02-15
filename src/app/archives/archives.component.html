@@ -1,21 +1,24 @@
-<div class="p-8">
-  <h2 class="text-2xl font-bold mb-4">Archived Requests</h2>
-  <table class="min-w-full bg-white rounded-lg text-gray-800 text-sm">
-    <thead class="bg-gray-200 text-gray-900">
-      <tr>
-        <th class="py-3 px-4 text-left font-semibold">Name</th>
-        <th class="py-3 px-4 text-left font-semibold">Date</th>
-        <th class="py-3 px-4 text-left font-semibold">Status</th>
-        <th class="py-3 px-4 text-left font-semibold">Archived At</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let doc of archivedRequests" class="border-b hover:bg-gray-50 transition">
-        <td class="py-3 px-4">{{ doc.name }}</td>
-        <td class="py-3 px-4">{{ doc.updated_at || doc.date_created | date:'medium' }}</td>
-        <td class="py-3 px-4 capitalize">{{ doc.status }}</td>
-        <td class="py-3 px-4">{{ doc.updated_at | date:'medium' }}</td>
-      </tr>
-    </tbody>
-  </table>
+<div class="admin-container">
+  <h2 class="dashboard-title">Archived Requests</h2>
+  
+  <div class="card">
+    <table class="records-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Archived At</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let doc of archivedRequests">
+          <td>{{ doc.name }}</td>
+          <td>{{ doc.updated_at || doc.date_created | date:'medium' }}</td>
+          <td class="capitalize">{{ doc.status }}</td>
+          <td>{{ doc.updated_at | date:'medium' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

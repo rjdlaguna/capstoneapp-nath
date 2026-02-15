@@ -39,7 +39,7 @@
     content: "";
     position: fixed;
     inset: 0;
-    background-image: url('/images/angeles_city_logo.png');
+    background-image: url('/assets/images/angeles_city_logo.png');
     background-size: 35%;
     background-repeat: no-repeat;
     background-position: center center;

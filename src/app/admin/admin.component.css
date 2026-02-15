@@ -17,51 +17,6 @@ html, body {
   background-color: #f5f9fc;
 }
 
-/*  SIDEBAR */
-.sidebar {
-  width: 120px;
-  background: #f7f7f7;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 30px;
-  border-right: 1px solid #ddd;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  z-index: 100;
-}
-
-.sidebar-logo img {
-  width: 70px;
-  margin-bottom: 20px;
-}
-
-/* Sidebar buttons */
-.side-btn {
-  width: 100%;
-  padding: 35px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  color: #df5757;
-  text-decoration: none;
-  font-size: 18px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.side-btn i {
-  font-size: 24px;
-}
-
-.side-btn:hover,
-.side-btn.active {
-  background: rgba(223, 87, 87, 0.12);
-  font-weight: bold;
-}
-
 /* ===============================
    MAIN CONTENT
 ================================ */

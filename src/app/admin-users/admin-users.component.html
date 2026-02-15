@@ -1,101 +1,111 @@
-<div class="admin-page">
-  <h1>Users</h1>
+<div class="app-container">
+  <!-- ================== MAIN CONTENT ================== -->
+  <div class="admin-container">
+    
+    <!-- ================== PAGE TITLE ================== -->
+    <h2 class="dashboard-title">Users</h2>
 
-  <!-- Create User Section -->
-  <div class="create-section">
-    <h2>Create Account</h2>
-    <form [formGroup]="createForm" (ngSubmit)="createUser()">
-      <input formControlName="email" type="email" placeholder="Email">
-      <input formControlName="password" type="password" placeholder="Password">
-      <select formControlName="role">
-        <option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</option>
+    <!-- ================== CREATE USER SECTION ================== -->
+    <div class="card">
+      <h3 class="dashboard-title">Create Account</h3>
+      <form [formGroup]="createForm" (ngSubmit)="createUser()" style="display: flex; flex-direction: column; gap: 12px;">
+        <input formControlName="email" type="email" placeholder="Email" style="padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+        <input formControlName="password" type="password" placeholder="Password" style="padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+        <select formControlName="role" style="padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+          <option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</option>
+        </select>
+
+        <!-- Only show for Admins -->
+        <div *ngIf="createForm.value.role == 1" style="margin: 8px 0;">
+          <label style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" formControlName="can_create_admins">
+            Can create other admins
+          </label>
+        </div>
+
+        <button type="submit" [disabled]="createForm.invalid || loading" class="btn complete" style="align-self: flex-start;">
+          {{ loading ? 'Creating...' : 'Create User' }}
+        </button>
+      </form>
+    </div>
+
+    <!-- ================== SEARCH & FILTER SECTION ================== -->
+    <div style="margin: 20px 0; display: flex; gap: 10px;">
+      <input
+        type="text"
+        placeholder="Search by name or email..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange($event)"
+        style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"
+      />
+      <select [(ngModel)]="filterRole" (ngModelChange)="onRoleFilterChange($event)" style="padding: 10px; border: 1px solid #ddd; border-radius: 4px; min-width: 150px;">
+        <option value="">All Roles</option>
+        <option *ngFor="let role of roles" [value]="role.value">{{ role.label }}</option>
       </select>
+    </div>
 
-      <!-- Only show for Admins -->
-      <div *ngIf="createForm.value.role == 1" style="margin:0.5rem 0;">
-        <label>
-          <input type="checkbox" formControlName="can_create_admins">
-          Can create other admins
-        </label>
-      </div>
+    <!-- ================== USERS TABLE ================== -->
+    <div class="card">
+      <h3 class="dashboard-title">All Users</h3>
+      <table class="records-table">
+        <thead>
+          <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of filteredUsers" style="cursor: pointer;">
+            <td>{{ user.full_name || 'N/A' }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              {{ getRoleLabel(user.role) }}
+              <span *ngIf="user.role == 1 && user.can_create_admins" title="Can create admins" style="margin-left: 8px;">
+                🔑
+              </span>
+            </td>
+            <td style="display: flex; justify-content: center; gap: 8px;">
+              <button (click)="selectUser(user)" class="btn pending">Edit</button>
+              <button (click)="deleteUser(user.id)" class="btn record">Delete</button>
+            </td>
+          </tr>
 
-      <button type="submit" [disabled]="createForm.invalid || loading">
-        {{ loading ? 'Creating...' : 'Create User' }}
-      </button>
-    </form>
-  </div>
+          <tr *ngIf="filteredUsers.length === 0">
+            <td colspan="4" style="text-align: center; padding: 20px;">No users found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-  <!-- Search & Role Filter -->
-  <div class="admin-filters" style="margin: 1rem 0; display: flex; gap: 0.5rem;">
-    <input
-      type="text"
-      placeholder="Search by name or email..."
-      [(ngModel)]="searchTerm"
-      (ngModelChange)="onSearchChange($event)"
-    />
-    <select [(ngModel)]="filterRole" (ngModelChange)="onRoleFilterChange($event)">
-      <option value="">All Roles</option>
-      <option *ngFor="let role of roles" [value]="role.value">{{ role.label }}</option>
-    </select>
-  </div>
+    <!-- ================== EDIT USER SECTION ================== -->
+    <div *ngIf="selectedUser" class="card">
+      <h3 class="dashboard-title">Edit User: {{ selectedUser.email }}</h3>
+      <form [formGroup]="editForm" (ngSubmit)="updateUser()" style="display: flex; flex-direction: column; gap: 12px;">
+        <input formControlName="email" type="email" placeholder="Email" style="padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+        <select formControlName="role" style="padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+          <option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</option>
+        </select>
 
-  <!-- Users Table -->
-  <div class="table-section">
-    <h2>All Users</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Full Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of filteredUsers">
-          <td>{{ user.full_name || 'N/A' }}</td>
-          <td>{{ user.email }}</td>
-          <td>
-            {{ getRoleLabel(user.role) }}
-            <span *ngIf="user.role == 1 && user.can_create_admins" title="Can create admins">
-              🔑
-            </span>
-          </td>
-          <td>
-            <button (click)="selectUser(user)">Edit</button>
-            <button (click)="deleteUser(user.id)">Delete</button>
-          </td>
-        </tr>
+        <!-- Only show for Admins -->
+        <div *ngIf="editForm.value.role == 1" style="margin: 8px 0;">
+          <label style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" formControlName="can_create_admins">
+            Can create other admins
+          </label>
+        </div>
 
-        <tr *ngIf="filteredUsers.length === 0">
-          <td colspan="4" style="text-align: center;">No users found.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+        <input formControlName="password" type="password" placeholder="New Password (optional)" style="padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+        
+        <div style="display: flex; gap: 10px;">
+          <button type="submit" [disabled]="editForm.invalid || loading" class="btn complete">
+            {{ loading ? 'Updating...' : 'Update User' }}
+          </button>
+          <button type="button" (click)="cancelEdit()" class="btn pending">Cancel</button>
+        </div>
+      </form>
+    </div>
 
-  <!-- Edit User Section -->
-  <div *ngIf="selectedUser" class="edit-section">
-    <h2>Edit User: {{ selectedUser.email }}</h2>
-    <form [formGroup]="editForm" (ngSubmit)="updateUser()">
-      <input formControlName="email" type="email" placeholder="Email">
-      <select formControlName="role">
-        <option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</option>
-      </select>
-
-      <!-- Only show for Admins -->
-      <div *ngIf="editForm.value.role == 1" style="margin:0.5rem 0;">
-        <label>
-          <input type="checkbox" formControlName="can_create_admins">
-          Can create other admins
-        </label>
-      </div>
-
-      <input formControlName="password" type="password" placeholder="New Password (optional)">
-      <button type="submit" [disabled]="editForm.invalid || loading">
-        {{ loading ? 'Updating...' : 'Update User' }}
-      </button>
-      <button type="button" (click)="cancelEdit()">Cancel</button>
-    </form>
   </div>
 </div>

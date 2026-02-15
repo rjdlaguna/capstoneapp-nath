@@ -27,6 +27,11 @@ import { IssuanceOfCertifiedCopyOfBirthOthersComponent } from './issuance-of-cer
 import { IssuanceOfMarriedLicenseComponent } from './issuance-of-married-license/issuance-of-married-license.component';
 import { DeathComponent } from './certificate_types/death/death.component';
 import { MarriageComponent } from './certificate_types/marriage/marriage.component';
+import { DeathdelayedComponent } from './certificate_types/deathdelayed/deathdelayed.component';
+import { MarriagedelayedComponent } from './certificate_types/marriagedelayed/marriagedelayed.component';
+import { BirthdelayedComponent } from './certificate_types/birthdelayed/birthdelayed.component';
+import { MarriagelicenseComponent } from './certificate_types/marriagelicense/marriagelicense.component';
+import { OthersComponent } from './certificate_types/others/others.component';
 export const routes: Routes = [
     { path: '', component: HomeComponent }, 
     {
@@ -60,6 +65,11 @@ export const routes: Routes = [
     { path: 'issuance-of-certified-copy-of-birth-others', component: IssuanceOfCertifiedCopyOfBirthOthersComponent },
     { path: 'issuance-of-married-license', component: IssuanceOfMarriedLicenseComponent },
     { path: 'death', component: DeathComponent },
-    { path: 'marriage', component: MarriageComponent }
+    { path: 'marriage', component: MarriageComponent },
+    { path: 'deathdelayed', component: DeathdelayedComponent },
+    { path: 'marriagedelayed', component: MarriagedelayedComponent },
+    { path: 'birthdelayed', component: BirthdelayedComponent },
+    {path: 'marriagelicense', component: MarriagelicenseComponent },
+    { path: 'others', component: OthersComponent },
 
 ];

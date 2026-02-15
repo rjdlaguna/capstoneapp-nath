@@ -17,11 +17,8 @@ export class ProcessRequestComponent implements OnInit {
   request: any;
   loading = true;
   errorMessage = '';
-
-   // Modal controls
   showDenyModal = false;
 
-  // Denial reasons with checkboxes
   denialOptions = [
     { key: 'blurry', label: 'Blurry', details: '', selected: false },
     { key: 'incomplete', label: 'Incomplete', details: '', selected: false },
@@ -44,20 +41,27 @@ export class ProcessRequestComponent implements OnInit {
       console.error('You are not logged in!');
       throw new Error('Unauthorized');
     }
-    return new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return new HttpHeaders({ Authorization: 'Bearer ' + token });
   }
 
   fetchRequestDetail() {
     this.loading = true;
     const headers = this.getAuthHeaders();
 
-    this.http.get<any>(`${this.backendUrl}/api/document_request/${this.requestId}`, { headers })
+    this.http.get<any>(this.backendUrl + '/api/document_request/' + this.requestId, { headers })
       .subscribe({
         next: (data) => {
           this.request = data;
+          console.log('Loaded request (process view):', this.request);
+
           if (this.request?.file_path) {
-            this.request.fullFileUrl = `${this.backendUrl}/${this.request.file_path}`;
+            this.request.fileUrls = this.request.file_path
+              .split(',')
+              .map((p: string) => this.backendUrl + '/' + p.trim());
+          } else {
+            this.request.fileUrls = [];
           }
+
           this.loading = false;
         },
         error: (err) => {
@@ -69,74 +73,79 @@ export class ProcessRequestComponent implements OnInit {
   }
 
   approveRequest() {
-  let headers: HttpHeaders;
-  try { headers = this.getAuthHeaders(); } catch { return; }
+    if (!confirm('Approve this request?')) return;
 
-  this.http.post(`${this.backendUrl}/api/document_request/${this.requestId}/approved`, {}, { headers })
-    .subscribe({
-      next: () => {
-        console.log('Request approved successfully');
+    let headers: HttpHeaders;
+    try { 
+      headers = this.getAuthHeaders(); 
+    } catch { 
+      return; 
+    }
 
-        // Navigate back to home-staff automatically
-        this.router.navigate(['/home-staff']).then(success => {
-          if (!success) console.warn('Navigation failed');
-        });
-      },
-      error: (err) => {
-        console.error('Failed to approve request:', err);
-      }
-    });
-}
-
-
-  // Show modal to select reasons
-denyRequest() {
-  this.showDenyModal = true;
-  this.denialOptions.forEach(opt => opt.details = '');
-}
-
-// Toggle checkbox selection
-toggleReason(event: any, option: any) {
-  option.selected = event.target.checked;
-}
-
-// Confirm deny: send to backend and navigate to home-staff
-confirmDeny() {
-  const selected = this.denialOptions.filter(opt => opt.selected);
-  if (selected.length === 0) {
-    console.error('Please select at least one reason.');
-    return;
+    this.http.post(this.backendUrl + '/api/document_request/' + this.requestId + '/approved', {}, { headers })
+      .subscribe({
+        next: () => {
+          console.log('Request approved successfully');
+          alert('Request approved!');
+          this.router.navigate(['/home-staff']);
+        },
+        error: (err) => {
+          console.error('Failed to approve request:', err);
+          alert('Failed to approve request.');
+        }
+      });
   }
 
-  const reasonStrings = selected.map(opt => `${opt.label}${opt.details ? `: ${opt.details}` : ''}`);
-  const finalReason = reasonStrings.join('; ');
+  denyRequest() {
+    this.showDenyModal = true;
+    this.denialOptions.forEach(opt => {
+      opt.details = '';
+      opt.selected = false;
+    });
+  }
 
-  let headers: HttpHeaders;
-  try { headers = this.getAuthHeaders(); } catch { return; }
+  toggleReason(event: any, option: any) {
+    option.selected = event.target.checked;
+  }
 
-  this.http.put(
-    `${this.backendUrl}/api/document_request/${this.requestId}/deny`,
-    { reason: finalReason },
-    { headers }
-  ).subscribe({
-    next: () => {
-      console.log('Request denied successfully');
-      this.showDenyModal = false;
-      this.denialOptions.forEach(opt => opt.selected = false);
+  confirmDeny() {
+    const selected = this.denialOptions.filter(opt => opt.selected);
+    if (selected.length === 0) {
+      alert('Please select at least one reason.');
+      return;
+    }
 
-      // Navigate back automatically
-      this.router.navigate(['/home-staff']).then(success => {
-        if (!success) console.warn('Navigation failed');
-      });
-    },
-    error: (err) => console.error('Failed to deny request:', err)
-  });
-}
+    const reasonStrings = selected.map(opt => opt.label + (opt.details ? ': ' + opt.details : ''));
+    const finalReason = reasonStrings.join('; ');
 
-// Cancel modal
-cancelDeny() {
-  this.showDenyModal = false;
-  this.denialOptions.forEach(opt => opt.selected = false);
-}
+    let headers: HttpHeaders;
+    try { 
+      headers = this.getAuthHeaders(); 
+    } catch { 
+      return; 
+    }
 
+    this.http.put(
+      this.backendUrl + '/api/document_request/' + this.requestId + '/deny',
+      { reason: finalReason },
+      { headers }
+    ).subscribe({
+      next: () => {
+        console.log('Request denied successfully');
+        alert('Request denied');
+        this.showDenyModal = false;
+        this.denialOptions.forEach(opt => opt.selected = false);
+        this.router.navigate(['/home-staff']);
+      },
+      error: (err) => {
+        console.error('Failed to deny request:', err);
+        alert('Failed to deny request.');
+      }
+    });
+  }
+
+  cancelDeny() {
+    this.showDenyModal = false;
+    this.denialOptions.forEach(opt => opt.selected = false);
+  }
 }

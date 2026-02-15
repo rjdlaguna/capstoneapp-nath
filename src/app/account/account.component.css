@@ -1,3 +1,4 @@
+/* Main Container */
 .account-container {
   position: relative;
   max-width: 750px;
@@ -7,13 +8,17 @@
   box-shadow: 0 30px 42px 30px rgba(0, 0, 0, 0.1);
   border: 5px solid #2563eb;
   overflow: hidden;
+  background-color: white;
 }
 
-
+/* Background Logo */
 .account-container::before {
   content: "";
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-image: url("/assets/images/angeles_city_logo.png");
   background-size: 50%;
   background-position: center;
@@ -21,47 +26,60 @@
   opacity: 0.2;
   z-index: 0;
 }
+
 .account-container > * {
   position: relative;
   z-index: 1;
 }
 
-
+/* Profile Settings */
 .profile-settings {
   max-width: 700px;
   margin: auto;
   font-family: Arial, sans-serif;
 }
+
+/* Import Button */
 .ImportB {
-box-shadow: 3px 4px 5px rgb(136, 136, 136);
-border-radius: 4px;
-padding: 8px 12px;
-background-color: rgb(255, 255, 255);
-border-radius: 5px;
-color: rgb(0, 0, 0);
-text-align: center;
-margin-left:450px;
-margin-top:-50px;
-border: 1px solid black;
-
+  box-shadow: 3px 4px 5px rgb(136, 136, 136);
+  border-radius: 5px;
+  padding: 8px 12px;
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+  text-align: center;
+  margin-left: 450px;
+  margin-top: -50px;
+  border: 1px solid black;
 }
+
 .ImportB:hover {
-background-color: rgb(103, 3, 161);
-color: white;
-border: 1px solid black;
-
+  background-color: rgb(103, 3, 161);
+  color: white;
+  border: 1px solid black;
 }
 
+/* Section Styling */
 .section {
   margin-bottom: 20px;
 }
 
+.section p {
+  margin: 5px 0;
+  padding: 8px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+/* Labels */
 label {
   font-weight: bold;
   display: block;
   margin-bottom: 8px;
+  color: #333;
 }
 
+/* Row Layouts */
 .row {
   display: flex;
   gap: 10px;
@@ -73,43 +91,68 @@ label {
   align-items: center;
 }
 
+/* Input Fields */
 input {
   flex: 1;
-  padding: 8px;
+  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s;
 }
 
+input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+input[readonly] {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* Base Button Styles */
 button {
-  padding: 8px 12px;
+  padding: 10px 16px;
   border-radius: 6px;
   border: none;
   cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+  margin-right: 10px;
 }
 
+button:last-child {
+  margin-right: 0;
+}
+
+/* Email Button */
 button.EmailB {
- background: white;
+  background: white;
   border: 1px solid rgb(173, 173, 173);
   color: black;
   box-shadow: 3px 4px 5px rgb(136, 136, 136);
 }
+
 button.EmailB:hover {
   background-color: green;
-  color: white
+  color: white;
 }
 
-
+/* Logout Button */
 button.LogoutB {
- background: white;
+  background: white;
   border: 1px solid rgb(173, 173, 173);
   color: black;
   box-shadow: 3px 4px 5px rgb(136, 136, 136);
 }
+
 button.LogoutB:hover {
   background-color: #cccccc;
   color: white;
 }
 
+/* Danger Button (Delete Account) */
 button.danger {
   background: white;
   border: 1px solid rgb(173, 173, 173);
@@ -122,27 +165,33 @@ button.danger:hover {
   color: white;
 }
 
+/* Save Button */
 button.save {
   background: white;
   border: 1px solid rgb(173, 173, 173);
   color: green;
   box-shadow: 3px 4px 5px rgb(136, 136, 136);
 }
+
 button.save:hover {
   background-color: green;
-  color: white
+  color: white;
 }
 
+/* Delete Button */
 button.delete {
   background: white;
   color: black;
+  border: 1px solid rgb(173, 173, 173);
+  box-shadow: 3px 4px 5px rgb(136, 136, 136);
 }
+
 button.delete:hover {
   background-color: #e74c3c;
-  color: white
+  color: white;
 }
 
-
+/* Profile Picture Section */
 .profile-picture {
   display: flex;
   align-items: center;
@@ -155,6 +204,7 @@ button.delete:hover {
   height: 64px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid #2563eb;
 }
 
 .profile-picture p {
@@ -162,6 +212,7 @@ button.delete:hover {
   color: #777;
 }
 
+/* Integrations Section */
 .integrations {
   display: flex;
   flex-direction: column;
@@ -175,6 +226,12 @@ button.delete:hover {
   padding: 12px;
   border: 1px solid #ddd;
   border-radius: 8px;
+  background-color: #f9f9f9;
+  transition: box-shadow 0.3s;
+}
+
+.integration-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .integration-card img {
@@ -184,6 +241,7 @@ button.delete:hover {
 
 .integration-card .title {
   font-weight: bold;
+  color: #333;
 }
 
 .integration-card .subtitle {
@@ -195,4 +253,23 @@ button.delete:hover {
   margin-left: auto;
   color: green;
   font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .account-container {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  .ImportB {
+    margin-left: 0;
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  .section button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
 }

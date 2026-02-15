@@ -1,17 +1,32 @@
-/* Container layout */
+/* Base Reset & Font */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  background-color: #f5f9fc;
+  font-family: "Lato", sans-serif;
+}
+
+/* EDITOR LAYOUT */
 .editor-preview-container {
   display: flex;
   gap: 2rem;
   padding: 1rem;
   min-height: 80vh;
+  background-color: #f5f9fc;
 }
 
+/* FORM PANEL */
 .form-panel {
   flex: 0 0 400px;
   padding: 1.5rem;
-  background: #d7d8d8;
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
   border: 1px solid #eaeaea;
 }
 
@@ -20,10 +35,12 @@
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
   font-weight: 600;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.5rem;
+  color: #2a7ca8;
+  border-bottom: 2px solid #2a7ca8;
+  padding-bottom: 0.75rem;
 }
 
+/* FORM GROUPS */
 .form-group {
   margin-bottom: 1.25rem;
 }
@@ -31,33 +48,37 @@
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: 500;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.95rem;
 }
 
 .form-group input,
 .form-group select {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #cbd5e0;
   border-radius: 6px;
   font-size: 0.9rem;
-  background-color: #f8fafc;
+  background-color: #fff;
+  transition: all 0.3s ease;
 }
 
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #4299e1;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+  border-color: #2a7ca8;
+  box-shadow: 0 0 0 3px rgba(42, 124, 168, 0.15);
 }
 
 .error {
   color: #e53e3e;
   font-size: 0.75rem;
   margin-top: 0.25rem;
+  font-weight: 500;
 }
 
-/* Buttons */
+/* BUTTONS */
 .button-group {
   display: flex;
   gap: 0.75rem;
@@ -69,53 +90,66 @@
   padding: 0.75rem 1.25rem;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: 500;
-  font-size: 0.9rem;
+  font-weight: 600;
+  font-size: 0.95rem;
   text-align: center;
-}
-
-.btn.secondary {
-  background: #f7fafc;
-  color: #4a5568;
-  border: 1px solid #cbd5e0;
-}
-
-.btn.secondary:hover {
-  background: #ebf8ff;
-}
-
-.btn-req {
-  background-color: #3BE2FF;
+  border: none;
+  transition: all 0.3s ease;
   color: #fff;
 }
 
-/* Certificate Preview Panel */
+.btn.secondary {
+  background: #6c757d;
+  color: #fff;
+}
+
+.btn.secondary:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-req {
+  background-color: #2a7ca8;
+  color: #fff;
+}
+
+.btn-req:hover {
+  background-color: #1e5a7a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* PREVIEW PANEL */
 .preview-panel {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
+  background: transparent;
+  position: relative;
 }
 
-/* Certificate (letter size, landscape) */
+/* CERTIFICATE (Letter size, landscape) */
 .certificate {
   width: 11in !important;
   height: 8.5in !important;
   background-size: cover;
   background-position: center;
   border: 1px solid #ccc;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75in; 
+  padding: 0.75in;
   position: relative;
   font-family: "Lato", sans-serif;
   color: #000;
   box-sizing: border-box;
+  background-color: #fff;
 }
 
-/* Inner content */
+/* CERTIFICATE CONTENT */
 .certificate-content {
   width: 100%;
   height: 100%;
@@ -125,21 +159,22 @@
   justify-content: space-between;
 }
 
-/* Logo at the top */
+/* CERTIFICATE LOGO */
 .cert-logo {
   width: 120px;
   margin: 0 auto 1rem auto;
 }
 
-/* Main headings */
+/* CERTIFICATE HEADINGS */
 .certificate h1 {
   font-size: 48px;
   font-family: "Noto Serif", serif;
   font-optical-sizing: auto;
   font-weight: bold;
   font-style: normal;
-  font-variation-settings:"wdth" 100;
+  font-variation-settings: "wdth" 100;
   margin: 0.5rem 0 0 0;
+  color: #2c3e50;
 }
 
 .certificate h2 {
@@ -148,7 +183,7 @@
   font-optical-sizing: auto;
   font-weight: bold;
   font-style: normal;
-  font-variation-settings:"wdth" 100;
+  font-variation-settings: "wdth" 100;
   color: #0355a1;
   margin: 0.5rem 0 1rem 0;
 }
@@ -165,32 +200,36 @@
   font-optical-sizing: auto;
   font-weight: bold;
   font-style: normal;
-  font-variation-settings:"wdth" 100;
+  font-variation-settings: "wdth" 100;
 }
 
-/* Certificate text */
+/* CERTIFICATE TEXT */
 .certificate-text {
-  line-height: 1.5;
+  line-height: 1.6;
   font-family: "Lato", sans-serif;
   font-style: normal;
-  font-weight: bold;
+  font-weight: 600;
+  color: #2c3e50;
 }
 
-/* Issuance details */
+/* ISSUANCE DETAILS */
 .issuance {
   font-weight: bold;
   margin-top: 1rem;
+  color: #2c3e50;
 }
 
 .iss-date {
-  color: #005bb0;
+  color: #2a7ca8;
+  font-weight: 700;
 }
 
-/* Signature section */
+/* SIGNATURE SECTION */
 .signatures {
   display: flex;
   justify-content: space-around;
   margin-top: 2rem;
+  padding: 0 2rem;
 }
 
 .signature {
@@ -198,7 +237,7 @@
 }
 
 .signature-line {
-  border-top: 1px solid #000;
+  border-top: 2px solid #2c3e50;
   width: 200px;
   margin: 0 auto 5px;
 }
@@ -209,23 +248,26 @@
   font-optical-sizing: auto !important;
   font-weight: bold;
   font-style: normal;
-  font-variation-settings:"wdth" 100 !important;
+  font-variation-settings: "wdth" 100 !important;
   color: #001b6b;
   font-size: 18px;
+  margin-bottom: 0.25rem;
 }
 
 .sig-roles {
   font-weight: bold;
+  color: #2c3e50;
+  font-size: 14px;
 }
 
-/* Popup modal adjustments for html2canvas */
+/* POPUP MODAL */
 .popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -239,6 +281,7 @@
   max-width: 95vw;
   max-height: 95vh;
   overflow: auto;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
 }
 
 .popup-overlay .certificate {
@@ -249,25 +292,84 @@
   margin: 0;
 }
 
-/* Responsive adjustments */
+/* RESPONSIVE DESIGN */
+@media (max-width: 1024px) {
+  .editor-preview-container {
+    gap: 1.5rem;
+  }
+
+  .form-panel {
+    flex: 0 0 350px;
+  }
+
+  .certificate {
+    transform: scale(0.8);
+  }
+}
+
 @media (max-width: 768px) {
   .editor-preview-container {
     flex-direction: column;
+    padding: 0.5rem;
   }
-  
+
   .form-panel {
     width: 100%;
+    flex: none;
+    padding: 1rem;
   }
-  
+
   .preview-panel {
     width: 100%;
+    overflow-x: auto;
   }
-  
+
+  .certificate {
+    transform: scale(0.6);
+    margin: 0 auto;
+  }
+
   .button-group {
     flex-direction: column;
   }
-  
+
   .btn {
     width: 100%;
+  }
+
+  .form-panel h2 {
+    font-size: 1.25rem;
+  }
+
+  .certificate h1 {
+    font-size: 36px;
+  }
+
+  .certificate h2 {
+    font-size: 28px;
+  }
+
+  .certificate h3 {
+    font-size: 18px;
+    width: 70%;
+  }
+
+  .signatures {
+    padding: 0 1rem;
+  }
+
+  .signature-line {
+    width: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .certificate {
+    transform: scale(0.4);
+  }
+
+  .form-group input,
+  .form-group select {
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 }

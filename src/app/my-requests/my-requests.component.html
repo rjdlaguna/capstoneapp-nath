@@ -1,37 +1,100 @@
-<div class="requests-container">
-  <h2>My Document Requests</h2>
+<div class="app-container">
+  <!-- ================== SIDEBAR ================== -->
+  <aside class="sidebar">
+    <!-- Sidebar content would go here -->
+  </aside>
 
-  <div *ngIf="requests.length === 0">
-    <p>You have no requests yet.</p>
-  </div>
+  <!-- ================== MAIN CONTENT ================== -->
+  <div class="admin-container">
+    
+    <!-- ================== PAGE TITLE ================== -->
+    <h2 class="dashboard-title">My Document Requests</h2>
 
-  <div *ngFor="let req of requests" class="request-card">
-    <div class="request-header">
-      <h3>{{ req.name }}</h3><br>
-      <span class="status" [ngClass]="req.status">{{ req.status | titlecase }}</span>
+    <!-- ================== LOADING STATE ================== -->
+    <div *ngIf="isLoading" class="card">
+      <p style="text-align: center; color: #999; padding: 30px 20px;">Loading your requests...</p>
     </div>
 
-    <h3>Document Requested: {{ req.document_type }}</h3>
-    <p>Last Updated: {{ req.updated_at | date:'short' }}</p>
-
-    <div class="request-actions">
-      <button (click)="viewHistory(req.RequestID)">
-        {{ historyMap[req.RequestID] ? 'Hide History' : 'View History' }}
-      </button>
-
-      <button *ngIf="req.file_path" (click)="downloadFile(req.RequestID, req.file_path)">
-        Download File
-      </button>
+    <!-- ================== NO REQUESTS STATE ================== -->
+    <div *ngIf="!isLoading && requests.length === 0" class="card">
+      <p style="text-align: center; color: #999; padding: 30px 20px;">You have no requests yet.</p>
     </div>
 
-    <div class="history" *ngIf="historyMap[req.RequestID]">
-      <h4>Status History:</h4>
-      <ul>
-        <li *ngFor="let h of historyMap[req.RequestID]">
-          <strong>{{ h.status | titlecase }}</strong> - {{ h.email_message }}
-          <em>({{ h.updated_at | date:'short' }})</em>
-        </li>
-      </ul>
+    <!-- ================== REQUESTS LIST ================== -->
+    <div *ngFor="let req of requests" class="card" style="margin-bottom: 16px;">
+      
+      <!-- Request Header -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;">
+        <div>
+          <h3 style="margin: 0 0 4px 0; font-size: 15px; font-weight: 600; color: #333;">{{ req.name }}</h3>
+          <p style="margin: 0; font-size: 12px; color: #999;">{{ req.date_created | date:'MMM d, yyyy' }}</p>
+        </div>
+        <span [ngClass]="'status-' + req.status" style="display: inline-block; padding: 4px 10px; border-radius: 3px; font-size: 11px; font-weight: 600; text-transform: uppercase; background-color: #e8f4f8; border: 1px solid #2a7ca8;">
+          {{ req.status | titlecase }}
+        </span>
+      </div>
+
+      <!-- Request Details -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; font-size: 13px;">
+        <div style="display: flex; justify-content: space-between; gap: 8px;">
+          <label style="font-weight: 600; color: #666;">Document Type:</label>
+          <span style="color: #333;">{{ req.document_type }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; gap: 8px;">
+          <label style="font-weight: 600; color: #666;">Last Updated:</label>
+          <span style="color: #333;">{{ req.updated_at | date:'MMM d, yyyy • HH:mm' }}</span>
+        </div>
+      </div>
+
+      <!-- Request Actions -->
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button (click)="viewHistory(req.RequestID)" 
+                class="btn pending"
+                [class.active]="isHistoryVisible(req.RequestID)"
+                [disabled]="isHistoryLoading(req.RequestID)"
+                style="padding: 6px 12px; min-width: 70px;">
+          {{ isHistoryLoading(req.RequestID) ? 'Loading...' : (isHistoryVisible(req.RequestID) ? 'Hide History' : 'View History') }}
+        </button>
+
+        <button *ngIf="req.file_path" 
+                (click)="downloadFile(req.RequestID, req.file_path)" 
+                class="btn complete"
+                style="padding: 6px 12px; min-width: 70px;">
+          Download File
+        </button>
+
+        <span *ngIf="!req.file_path" style="padding: 6px 12px; color: #999; font-size: 12px; font-weight: 500; align-self: center;">
+          No file available
+        </span>
+      </div>
+
+      <!-- History Section -->
+      <div *ngIf="isHistoryVisible(req.RequestID)" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0;">
+        <h4 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 600; color: #333;">Status History</h4>
+
+        <div *ngIf="isHistoryLoading(req.RequestID)" style="text-align: center; padding: 15px; color: #999;">
+          Loading history...
+        </div>
+
+        <div *ngIf="!isHistoryLoading(req.RequestID) && historyMap[req.RequestID] && historyMap[req.RequestID].length > 0" style="display: flex; flex-direction: column; gap: 8px;">
+          <div *ngFor="let h of historyMap[req.RequestID]" style="display: flex; gap: 10px; padding: 10px; background-color: #f9f9f9; border-radius: 4px; border-left: 3px solid #2a7ca8; font-size: 12px;">
+            <div [ngClass]="'status-' + h.status" style="display: inline-block; padding: 3px 8px; border-radius: 2px; font-size: 10px; font-weight: 600; text-transform: uppercase; background-color: #e8f4f8; border: 1px solid #2a7ca8; white-space: nowrap; min-width: 70px; text-align: center; flex-shrink: 0;">
+              {{ h.status | titlecase }}
+            </div>
+            <div style="flex: 1;">
+              <p style="margin: 0 0 2px 0; color: #555; line-height: 1.4;">{{ h.email_message }}</p>
+              <small style="color: #999; font-size: 11px;">{{ h.updated_at | date:'MMM d, yyyy • HH:mm' }}</small>
+            </div>
+          </div>
+        </div>
+
+        <p *ngIf="!isHistoryLoading(req.RequestID) && (!historyMap[req.RequestID] || historyMap[req.RequestID].length === 0)" 
+           style="text-align: center; color: #999; padding: 15px; margin: 0;">
+          No history available.
+        </p>
+      </div>
+
     </div>
+
   </div>
 </div>
