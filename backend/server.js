@@ -1053,10 +1053,10 @@ app.post('/api/document_request', verifyToken, checkRoles([3]), (req, res) => {
 //   res.sendFile(path.join(__dirname, 'public/browser/index.html'));
 // });
 
-app.use(express.static(path.join(__dirname, 'dist/static')));
+app.use(express.static(path.join(__dirname, 'dist/DRT')));
 
 app.get(/^(?!\/api).*/, (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist/static/index.html'));
+    res.sendFile(path.join(__dirname, 'dist/DRT/index.html'));
 });
 
 // Global error handler (optional, for catching any errors)
