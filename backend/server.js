@@ -1046,16 +1046,16 @@ app.post('/api/document_request', verifyToken, checkRoles([3]), (req, res) => {
 /* START SERVER */
 
 // Serve static files from Angular build
-app.use(express.static(path.join(__dirname, 'public/browser')));
+// app.use(express.static(path.join(__dirname, 'public/browser')));
 
 // Handle Angular routing - catch-all route for all non-API routes
-app.get(/^(?!\/api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/browser/index.html'));
-});
+// app.get(/^(?!\/api).*/, (req, res) => {
+//   res.sendFile(path.join(__dirname, 'public/browser/index.html'));
+// });
 
 app.use(express.static(path.join(__dirname, 'dist/static')));
 
-app.get('*', (req, res) => {
+app.get(/^(?!\/api).*/, (req, res) => {
     res.sendFile(path.join(__dirname, 'dist/static/index.html'));
 });
 
