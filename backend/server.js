@@ -2,6 +2,8 @@
   console.log('SENDGRID_FROM:', process.env.SENDGRID_FROM);
   console.log('SENDGRID_API_KEY loaded:', !!process.env.SENDGRID_API_KEY);
   const express = require('express');
+  const helmet = require('helmet');
+  const compression = require('compression');
   const cors = require('cors');
   const mysql = require('mysql2');
   const bcrypt = require('bcrypt');
@@ -96,32 +98,43 @@ function sendRequestStatusEmail(to, status, reason = null, documentType = '') {
 }
 
   const app = express();
-    // Add this after const app = express();
-app.use(express.static(path.join(__dirname, 'public')));
+  app.use(helmet({
+  contentSecurityPolicy: false, // Can be enabled if needed
+}));
+  app.use(compression());
+//app.use(express.static(path.join(__dirname, 'public')));
 
   app.use(cors({
-    origin: ['http://localhost:4200', 'http://localhost:4000', 'https://angelescitydrt.org'],
-    credentials: true
-  }));
+  origin: process.env.NODE_ENV === 'production'
+    ? ['https://angelescitydrt.org', 'https://www.angelescitydrt.org']
+    : ['http://localhost:4200', 'http://localhost:4000'],
+  credentials: true
+}));
 
   app.use(express.json());
 
   const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    ssl: false
-  });
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT || 3306,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  connectTimeout: 10000
+});
 
-  db.connect(err => {
-    if (err) {
-      console.error('Database connection failed:', err);
-      process.exit(1);
-    }
-    console.log('Connected to MySQL');
-  });
+db.connect(err => {
+  if (err) {
+    console.error('❌ Database connection failed:', err);
+    process.exit(1);
+  }
+  console.log('✅ Connected to MySQL');
+});
+
+// Handle database errors
+db.on('error', (err) => {
+  console.error('Database error:', err);
+});
 
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -150,7 +163,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
     if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'yoursecretkey');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = decoded;
       next();
     } catch (err) {
@@ -399,7 +412,7 @@ app.post('/api/auth/login', (req, res) => {
 
       const token = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
-        process.env.JWT_SECRET || 'yoursecretkey',
+        process.env.JWT_SECRET,
         { expiresIn: '1d' }
       );
 
@@ -452,7 +465,7 @@ app.post('/api/auth/login', (req, res) => {
 
       let decoded;
       try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET || 'yoursecretkey');
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
       } catch (err) {
         return res.status(401).json({ message: 'Invalid token' });
       }
@@ -1030,15 +1043,34 @@ app.post('/api/document_request', verifyToken, checkRoles([3]), (req, res) => {
 
 
 
-  /* START SERVER */
- // Serve Angular static files (add this AFTER all API routes, BEFORE app.listen)
-app.use(express.static(path.join(__dirname, 'dist/DRT/browser')));
+/* START SERVER */
 
-// Handle Angular routing - return index.html for all non-API routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist/DRT/browser/index.html'));
+// Serve static files from Angular build
+app.use(express.static(path.join(__dirname, 'public/browser')));
+
+// Handle Angular routing - catch-all route for all non-API routes
+app.get(/^(?!\/api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/browser/index.html'));
 });
 
-/* START SERVER */
+// Global error handler (optional, for catching any errors)
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(err.status || 500).json({
+    message: process.env.NODE_ENV === 'production' ? 'An error occurred' : err.message
+  });
+});
+
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Open http://localhost:${PORT} in your browser`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Closing server gracefully...');
+  db.end();
+  process.exit(0);
+});
