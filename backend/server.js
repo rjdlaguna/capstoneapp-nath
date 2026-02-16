@@ -18,7 +18,7 @@
 
 
 
-  
+
   // OTP EMAIL
   function sendOtpEmail(to, otp) {
     const msg = {
@@ -100,7 +100,7 @@ function sendRequestStatusEmail(to, status, reason = null, documentType = '') {
 app.use(express.static(path.join(__dirname, 'public')));
 
   app.use(cors({
-    origin: ['http://localhost:4200', 'http://localhost:4000'],
+    origin: ['http://localhost:4200', 'http://localhost:4000', 'https://angelescitydrt.org'],
     credentials: true
   }));
 
@@ -348,15 +348,15 @@ function checkRoles(allowedRoles) {
 
     // Check last OTP sent time
     const now = new Date();
-    const lastSent = new Date(pendingUser.otp_expires_at.getTime() - 10*60*1000); 
-    const cooldown = 60 * 1000; 
+    const lastSent = new Date(pendingUser.otp_expires_at.getTime() - 10*60*1000);
+    const cooldown = 60 * 1000;
     if (now - lastSent < cooldown) {
       return res.status(429).json({ message: `Please wait ${Math.ceil((cooldown - (now - lastSent))/1000)} seconds before resending OTP` });
     }
 
     // Generate new OTP
     const otp = Math.floor(100000 + Math.random() * 900000);
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); 
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     db.query(
       'UPDATE pending_users SET otp = ?, otp_expires_at = ? WHERE id = ?',
@@ -1031,5 +1031,14 @@ app.post('/api/document_request', verifyToken, checkRoles([3]), (req, res) => {
 
 
   /* START SERVER */
-  const PORT = process.env.PORT || 4000;
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+ // Serve Angular static files (add this AFTER all API routes, BEFORE app.listen)
+app.use(express.static(path.join(__dirname, 'dist/DRT/browser')));
+
+// Handle Angular routing - return index.html for all non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist/DRT/browser/index.html'));
+});
+
+/* START SERVER */
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
