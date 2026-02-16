@@ -1053,6 +1053,12 @@ app.get(/^(?!\/api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'public/browser/index.html'));
 });
 
+app.use(express.static(path.join(__dirname, 'dist/static')));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist/static/index.html'));
+});
+
 // Global error handler (optional, for catching any errors)
 app.use((err, req, res, next) => {
   console.error('Error:', err);
