@@ -18,6 +18,7 @@
   flex: 1;
   padding: 60px 40px;
   position: relative;
+  background: #d3cdcd;
 }
 
 /* Watermark */
@@ -43,10 +44,11 @@
 /* ================= DOCUMENT LIST ================= */
 .documents-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 35px;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 20px;
 }
 
 /* ================= DOCUMENT CARD ================= */
@@ -58,6 +60,8 @@
   border-left: 6px solid #f44336;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .document-card:hover {
@@ -69,6 +73,8 @@
   font-size: 22px;
   color: #b30000;
   margin-bottom: 15px;
+  line-height: 1.3;
+  word-wrap: break-word;
 }
 
 .document-card p {
@@ -81,7 +87,7 @@
 .document-actions {
   display: flex;
   gap: 12px;
-  margin-top: 20px;
+  margin-top: auto;
 }
 
 /* View Requirements */
@@ -90,16 +96,23 @@
   background: #f44336;
   color: #fff;
   border: none;
-  padding: 14px 18px;
-  font-size: 15px;
+  padding: 14px 12px;
+  font-size: 14px;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.25s ease, transform 0.2s ease;
+  font-weight: 600;
+  white-space: normal;
+  line-height: 1.3;
 }
 
 .view-btn:hover {
   background: #c62828;
   transform: scale(1.04);
+}
+
+.view-btn:active {
+  transform: scale(0.98);
 }
 
 /* Apply Button */
@@ -108,11 +121,14 @@
   background: #0a6cff;
   color: #fff;
   border: none;
-  padding: 14px 18px;
-  font-size: 15px;
+  padding: 14px 12px;
+  font-size: 14px;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.25s ease, transform 0.2s ease;
+  font-weight: 600;
+  white-space: normal;
+  line-height: 1.3;
 }
 
 .apply-btn:hover {
@@ -120,27 +136,75 @@
   transform: scale(1.04);
 }
 
-/* ================= MOBILE ================= */
-@media screen and (max-width: 768px) {
-  .sidebar {
-    width: 95px;
+.apply-btn:active {
+  transform: scale(0.98);
+}
+
+/* ================= RESPONSIVE BREAKPOINTS ================= */
+
+/* Tablet and Below */
+@media screen and (max-width: 1024px) {
+  .documents-page {
+    padding: 40px 25px;
   }
 
-  .side-btn {
-    font-size: 14px;
-    padding: 20px 0;
+  .page-title {
+    font-size: 36px;
+    margin-bottom: 35px;
   }
 
-  .side-btn i {
+  .documents-list {
+    gap: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .document-card {
+    padding: 28px 24px;
+  }
+
+  .document-card h3 {
     font-size: 20px;
   }
+}
 
+/* Tablet Only - 2 Column Layout */
+@media screen and (min-width: 601px) and (max-width: 900px) {
+  .documents-list {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 800px;
+  }
+
+  .document-card h3 {
+    font-size: 19px;
+  }
+
+  .view-btn,
+  .apply-btn {
+    font-size: 13px;
+    padding: 12px 10px;
+  }
+}
+
+/* Mobile - Stack Buttons */
+@media screen and (max-width: 600px) {
   .documents-page {
-    padding: 40px 20px;
+    padding: 30px 18px;
+  }
+
+  .documents-page::before {
+    background-size: 60%;
   }
 
   .page-title {
     font-size: 28px;
+    margin-bottom: 25px;
+  }
+
+  .documents-list {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    max-width: 500px;
+    padding: 0 10px;
   }
 
   .document-card {
@@ -149,45 +213,80 @@
 
   .document-card h3 {
     font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .document-card p {
+    font-size: 14px;
+    margin-bottom: 20px;
   }
 
   .document-actions {
     flex-direction: column;
+    gap: 10px;
   }
 
   .view-btn,
   .apply-btn {
     width: 100%;
     font-size: 14px;
-    padding: 12px;
+    padding: 13px 16px;
   }
 }
 
-/* ================= TABLET ================= */
-@media screen and (min-width: 769px) and (max-width: 1024px) {
-  .sidebar {
-    width: 100px;
+/* Small Mobile */
+@media screen and (max-width: 480px) {
+  .documents-page {
+    padding: 25px 15px;
   }
 
   .page-title {
-    font-size: 36px;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .document-card {
+    padding: 20px 16px;
+    border-left-width: 4px;
+  }
+
+  .document-card h3 {
+    font-size: 16px;
+  }
+
+  .document-card p {
+    font-size: 13px;
   }
 
   .view-btn,
   .apply-btn {
-    font-size: 14px;
+    font-size: 13px;
     padding: 12px 14px;
   }
 }
 
-/* ================= DESKTOP ================= */
-@media screen and (min-width: 1025px) {
-  .page-title {
-    font-size: 48px;
+/* Large Desktop */
+@media screen and (min-width: 1400px) {
+  .documents-list {
+    max-width: 1400px;
+    gap: 40px;
+  }
+
+  .document-card {
+    padding: 40px 35px;
+  }
+
+  .document-card h3 {
+    font-size: 24px;
+  }
+
+  .document-card p {
+    font-size: 16px;
   }
 
   .view-btn,
   .apply-btn {
-    font-size: 16px;
+    font-size: 15px;
+    padding: 16px 18px;
   }
 }

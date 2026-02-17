@@ -1,52 +1,97 @@
 <div class="app-container">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-  <aside class="sidebar" *ngIf="showSidebar">
+  <!-- Mobile Menu Toggle Button -->
+  <button class="mobile-menu-toggle" *ngIf="showSidebar" (click)="toggleMobileSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar Overlay (for mobile) -->
+  <div class="sidebar-overlay" 
+       [class.active]="isMobileSidebarOpen" 
+       (click)="closeMobileSidebar()"
+       *ngIf="showSidebar"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" 
+         [class.mobile-open]="isMobileSidebarOpen"
+         *ngIf="showSidebar">
     <div class="sidebar-logo">
       <img src="assets/images/angeles_city_logo.png" alt="Logo" />
     </div>
 
+    <!-- Regular User Links -->
     <ng-container *ngIf="!isAdmin && !isStaff">
-      <a class="side-btn" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a class="side-btn" 
+         routerLink="/" 
+         routerLinkActive="active" 
+         [routerLinkActiveOptions]="{exact: true}"
+         (click)="closeMobileSidebar()">
         <i class="fas fa-house"></i><span>Home</span>
       </a>
-      <a class="side-btn" routerLink="/documents" routerLinkActive="active">
+      <a class="side-btn" 
+         routerLink="/documents" 
+         routerLinkActive="active"
+         (click)="closeMobileSidebar()">
         <i class="fas fa-file"></i><span>Documents</span>
       </a>
-      <a class="side-btn" routerLink="/my-requests" routerLinkActive="active">
+      <a class="side-btn" 
+         routerLink="/my-requests" 
+         routerLinkActive="active"
+         (click)="closeMobileSidebar()">
         <i class="fa-solid fa-envelope-open-text"></i><span>Requests</span>
       </a>
     </ng-container>
 
+    <!-- Staff Links -->
     <ng-container *ngIf="isStaff">
-      <a class="side-btn" routerLink="/home-staff" routerLinkActive="active">
+      <a class="side-btn" 
+         routerLink="/home-staff" 
+         routerLinkActive="active"
+         (click)="closeMobileSidebar()">
         <i class="fas fa-house"></i><span>Staff Home</span>
       </a>
     </ng-container>
 
+    <!-- Admin Links -->
     <ng-container *ngIf="isAdmin">
-      <a class="side-btn" routerLink="/admin" routerLinkActive="active">
+      <a class="side-btn" 
+         routerLink="/admin" 
+         routerLinkActive="active"
+         (click)="closeMobileSidebar()">
         <i class="fa-solid fa-chart-line"></i><span>Admin</span>
       </a>
-
-      <a class="side-btn" routerLink="/admin-users" routerLinkActive="active">
+      <a class="side-btn" 
+         routerLink="/admin-users" 
+         routerLinkActive="active"
+         (click)="closeMobileSidebar()">
         <i class="fa-solid fa-users"></i><span>Users</span>
       </a>
-      <a class="side-btn" routerLink="/archives" routerLinkActive="active">
+      <a class="side-btn" 
+         routerLink="/archives" 
+         routerLinkActive="active"
+         (click)="closeMobileSidebar()">
         <i class="fa-solid fa-archive"></i><span>Archives</span>
       </a>
     </ng-container>
 
+    <!-- Bottom Links -->
     <div class="sidebar-bottom">
-      <a class="side-btn" routerLink="/account" routerLinkActive="active">
+      <a class="side-btn" 
+         routerLink="/account" 
+         routerLinkActive="active"
+         (click)="closeMobileSidebar()">
         <i class="fa-solid fa-user"></i><span>Account</span>
       </a>
-      <a class="side-btn" (click)="logout()" style="cursor:pointer;">
+      <a class="side-btn" 
+         (click)="logout()" 
+         style="cursor:pointer;">
         <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
       </a>
     </div>
   </aside>
 
+  <!-- Main Content -->
   <main class="content-area" [ngClass]="{'no-sidebar': !showSidebar}">
     <router-outlet></router-outlet>
   </main>

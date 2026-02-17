@@ -1,5 +1,10 @@
-.app-container { display: flex; min-height: 100vh; }
+/* ================= APP LAYOUT ================= */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
 
+/* ================= SIDEBAR ================= */
 .sidebar {
   width: 120px;
   height: 100vh;
@@ -12,6 +17,7 @@
   align-items: center;
   padding-top: 30px;
   z-index: 100;
+  transition: transform 0.3s ease;
 }
 
 .sidebar-logo img {
@@ -41,7 +47,197 @@
   background: rgba(223, 87, 87, 0.1);
   font-weight: bold;
 }
-.sidebar-bottom { margin-top: auto; width: 100%; padding-bottom: 20px; }
 
-.content-area { flex: 1; position: relative; }
-.no-sidebar { margin-left: 0; }
+.sidebar-bottom {
+  margin-top: auto;
+  width: 100%;
+  padding-bottom: 20px;
+}
+
+.content-area {
+  flex: 1;
+  position: relative;
+}
+
+.no-sidebar {
+  margin-left: 0;
+}
+
+/* ================= MOBILE MENU TOGGLE ================= */
+.mobile-menu-toggle {
+  display: none;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 101;
+  background: #f44336;
+  color: #fff;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s ease;
+}
+
+.mobile-menu-toggle:hover {
+  background: #c62828;
+}
+
+.mobile-menu-toggle i {
+  font-size: 22px;
+}
+
+/* ================= MOBILE OVERLAY ================= */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+}
+
+.sidebar-overlay.active {
+  display: block;
+}
+
+/* ================= RESPONSIVE BREAKPOINTS ================= */
+
+/* Tablet */
+@media screen and (max-width: 1024px) {
+  .sidebar {
+    width: 100px;
+    padding-top: 25px;
+  }
+
+  .sidebar-logo img {
+    width: 65px;
+    margin-bottom: 20px;
+  }
+
+  .side-btn {
+    padding: 28px 0;
+    font-size: 15px;
+    gap: 14px;
+  }
+
+  .side-btn i {
+    font-size: 20px;
+  }
+}
+
+/* Mobile - Sidebar becomes drawer */
+@media screen and (max-width: 768px) {
+  .mobile-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    transform: translateX(-100%);
+    padding-top: 80px;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-logo {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .sidebar-logo img {
+    width: 60px;
+    margin-bottom: 0;
+  }
+
+  .side-btn {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 18px 25px;
+    gap: 15px;
+    font-size: 16px;
+  }
+
+  .side-btn i {
+    font-size: 20px;
+    width: 30px;
+  }
+
+  .side-btn span {
+    text-align: left;
+  }
+
+  .content-area {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .no-sidebar {
+    margin-left: 0;
+  }
+}
+
+/* Small Mobile */
+@media screen and (max-width: 480px) {
+  .mobile-menu-toggle {
+    width: 45px;
+    height: 45px;
+    top: 12px;
+    left: 12px;
+  }
+
+  .mobile-menu-toggle i {
+    font-size: 20px;
+  }
+
+  .sidebar {
+    width: 220px;
+    padding-top: 70px;
+  }
+
+  .sidebar-logo img {
+    width: 55px;
+  }
+
+  .side-btn {
+    padding: 16px 20px;
+    font-size: 15px;
+  }
+
+  .side-btn i {
+    font-size: 18px;
+  }
+}
+
+/* Large Desktop */
+@media screen and (min-width: 1400px) {
+  .sidebar {
+    width: 140px;
+  }
+
+  .sidebar-logo img {
+    width: 90px;
+  }
+
+  .side-btn {
+    padding: 38px 0;
+    font-size: 19px;
+    gap: 20px;
+  }
+
+  .side-btn i {
+    font-size: 26px;
+  }
+}

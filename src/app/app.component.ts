@@ -32,6 +32,7 @@ export class AppComponent {
   isLoggedIn = false;
   isAdmin = false;
   isStaff = false;
+  isMobileSidebarOpen = false;
 
   constructor(private router: Router) {
     this.checkLogin();
@@ -47,6 +48,9 @@ export class AppComponent {
         this.isAdmin = user.role === 1;
         this.isStaff = user.role === 2;
 
+        // Close mobile sidebar on navigation
+        this.isMobileSidebarOpen = false;
+
         // Redirect users to their "home" if they access the root
         if (event.urlAfterRedirects === '/') {
           if (this.isAdmin) this.router.navigate(['/admin']);
@@ -55,10 +59,19 @@ export class AppComponent {
       });
   }
 
+  toggleMobileSidebar(): void {
+    this.isMobileSidebarOpen = !this.isMobileSidebarOpen;
+  }
+
+  closeMobileSidebar(): void {
+    this.isMobileSidebarOpen = false;
+  }
+
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.isLoggedIn = false;
+    this.isMobileSidebarOpen = false;
     this.router.navigate(['/login']);
   }
 
